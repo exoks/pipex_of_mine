@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/11/24 00:57:07 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/11/24 21:45:03 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -45,6 +45,7 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
 		cmds[i - 2].id = i - 1;
 		cmds[i - 2].args = ft_split(av[i], ' ');
 		cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", (cmds[i - 2].args)[0]), env);
+		cmds[i - 2].ncmds = ac - 3;
 	}
 	cmds[i - 2].id = 0;
 	return (cmds);

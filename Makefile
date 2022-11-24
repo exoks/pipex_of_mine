@@ -6,7 +6,7 @@
 #    By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/23 13:03:13 by oezzaou           #+#    #+#              #
-#    Updated: 2022/11/23 17:42:40 by oezzaou          ###   ########.fr        #
+#    Updated: 2022/11/24 22:04:38 by oezzaou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 SRC = pipex.c pipex_utils.c
@@ -28,6 +28,8 @@ clean:
 fclean: clean
 	make -C libft/ fclean
 
-re : fclean
+re : fclean all
 
+test:
+	./$(NAME) "file1" "cat" "cat -e" "file2" && cat file2
 .PHONEY: all clean fclean re
