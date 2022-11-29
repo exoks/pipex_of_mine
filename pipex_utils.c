@@ -6,13 +6,14 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/11/26 22:36:30 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/11/29 16:19:15 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
 
 char	*ft_get_cmd_path(char *cmd_name, char **env);
 char	**ft_get_paths(char **env);
+char	**ft_mini_split(char *s);
 
 void	ft_print_cmds(t_cmd *cmds)
 {
@@ -22,10 +23,48 @@ void	ft_print_cmds(t_cmd *cmds)
 	while (cmds[++i].id)
 	{
 		printf("ID|=> %d\n", cmds[i].id);
+		printf("NAME|=> %s\n", cmds[i].name);
 		while (*cmds[i].args)
-				printf(":-> %s\n", *(cmds[i].args++));
+				printf(":--> %s\n", *(cmds[i].args++));
 		printf("PATH|==> %s\n", cmds[i].path);
 	}
+}
+
+int	ft_whos_first(char *s)
+{
+	int	i;
+
+	i = -1;
+	while (s[++i] && s[i] != '\'' && s[i] != '"')
+		;
+	if (s[i])
+		return ((int) s[i]);
+	return (' ');
+}
+
+char	**ft_extract_args(char *cmd)
+{
+	char	sep;
+	char	**args;
+	char	*tmp;
+//	int		i;
+
+	sep = (int) ft_whos_first(cmd);
+	args = ft_split(cmd, sep);
+	tmp = args[0];
+	args[0] = ft_strtrim(tmp, " ");
+	free(tmp);
+	if (ft_strrchr(args[0], '/') && !ft_strchr(args[0], '.'))
+	{
+		tmp = args[0];
+		args[0] = ft_strdup((ft_strrchr(args[0], '/') + 1));
+	//	i = ft_strlen(tmp);
+	//	while (tmp[--i] && !ft_strchr("/", tmp[i]))
+	//		;
+	//	cmds->path = ft_substr(tmp, 0, i);
+		free(tmp);
+	}
+	return (args);
 }
 
 void	ft_clear_cmds(t_cmd *cmds)
@@ -36,7 +75,7 @@ void	ft_clear_cmds(t_cmd *cmds)
 	i = -1;
 	while (cmds[++i].id)
 	{
-		free(cmds[i].name);
+//		free(cmds[i].name);
 		free(cmds[i].path);
 		j = -1;
 		while((cmds[i].args)[++j])
@@ -58,28 +97,12 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
 	while (++i < ac - 1)
 	{
 		cmds[i - 2].id = i - 1;
-		/*int	j = -1;
-		while (av[i][++j])
-		{
-			if (av[i][j] == '\'')
-				av[i][j] = '"';
-		}*/
-		if (ft_strchr(ft_strtrim(av[i], "/"), '/'))
-			av[i] = ft_strrchr(ft_strtrim(av[i], "/"), '/') + 1;
-		if (ft_strrchr(av[i], '\'') && !ft_strchr(av[i], '"'))
-			cmds[i - 2].args = ft_split(av[i], '\'');
-		else if (ft_strrchr(av[i], '"') && !ft_strchr(av[i], '\''))
-			cmds[i - 2].args = ft_split(av[i], '"');
-		else if (ft_strchr(av[i], '"') && ft_strchr(av[i], '\''))
-		{
-			cmds[i - 2].args = ft_split(av[i], '\'');
-			(cmds[i - 2].args)[1] = ft_strtrim((cmds[i - 2].args)[1], "\"");
-			(cmds[i - 2].args)[0] = ft_strtrim((cmds[i - 2].args)[0], "\"");
-		}
+		cmds[i - 2].args = ft_extract_args(av[i]);
+		cmds[i - 2].name = (cmds[i - 2].args)[0];
+		if (!access(cmds[i - 2].name, F_OK & X_OK))
+			cmds[i - 2].path = ft_strtrim(cmds[i - 2].name, "./\"");
 		else
-			cmds[i - 2].args = ft_split(av[i], ' ');
-		cmds[i - 2].name = ft_strtrim((cmds[i - 2].args)[0], " ");
-		cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", cmds[i - 2].name), env);
+			cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", cmds[i - 2].name), env);
 		cmds[i - 2].ncmds = ac - 3;
 		cmds[i - 2].infile = av[1];
 		cmds[i - 2].outfile = av[ac - 1];
@@ -98,12 +121,12 @@ char	*ft_get_cmd_path(char *cmd_name, char **env)
 	path = 0;
 	paths = ft_get_paths(env);
 	if (!paths)
-		exit(127);
+		return (0);
 	i = -1;
 	while (paths[++i])
 	{
 		tmp = ft_strjoin(paths[i], cmd_name);
-		if (!access(tmp, F_OK | X_OK))
+		if (!access(tmp, F_OK & X_OK))
 			path = ft_strjoin(paths[i], cmd_name);
 		free(tmp);
 		free(paths[i]);
@@ -113,11 +136,31 @@ char	*ft_get_cmd_path(char *cmd_name, char **env)
 	return (path);
 }
 
+char	**ft_mini_split(char *s)
+{
+	int		i;
+	char	**tab;
+	
+	i = -1;
+	while (s[++i] && s[i] != ' ')
+		;
+	tab = (char **) malloc(sizeof(char *) * 3);
+	if (!tab)
+		return (0);
+	tab[0] = ft_substr(s, 0, i);
+	tab[1] = ft_strdup(&s[i + 1]);
+	tab[2] = 0;
+	return (tab);
+}
+
 char	**ft_get_paths(char **env)
 {
-	while (*env && !ft_strnstr(*env, "PATH", 4))
+	char	*path;
+
+	path = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki";
+	while (env && *env && !ft_strnstr(*env, "PATH", 4))
 		env++;
-	if (*env)
+	if (env && *env)
 		return (ft_split(ft_strchr(*env, '/'), ':'));
-	return (0);
+	return (ft_split(path, ':'));
 }

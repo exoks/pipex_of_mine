@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/11/26 22:34:38 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/11/29 16:10:59 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -26,8 +26,8 @@ int	main(int ac, char **av, char **env)
 	get_inout_files(cmds, &inout_fd[0]);
 	pipes = ft_manage_pipes(pipes, cmds->ncmds, PIPE);
 	ft_exec_cmds(cmds, env, pipes, inout_fd);
-//	ft_print_cmds(cmds);
-	ft_manage_pipes(inout_fd, 2, CLOSE);
+	ft_print_cmds(cmds);
+/*	ft_manage_pipes(inout_fd, 2, CLOSE);
 	ft_manage_pipes(pipes, cmds->ncmds, CLOSE);
 	int	i = -1;
 	while (cmds[++i].id)
@@ -37,12 +37,12 @@ int	main(int ac, char **av, char **env)
 	}
 	ft_clear_cmds(cmds);
 	free(pipes);
-	return (WEXITSTATUS(status));
+	return (WEXITSTATUS(status));*/
 }
 
 int	get_inout_files(t_cmd *cmds, int *inout_fd)
 {
-	inout_fd[0] = open(cmds->infile, O_RDONLY);
+	inout_fd[0] = open(cmds->infile, O_RDONLY | O_CREAT, 0644);
 	if (inout_fd[0] == -1)
 		perror(0);
 	inout_fd[1] = open(cmds->outfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
@@ -52,6 +52,21 @@ int	get_inout_files(t_cmd *cmds, int *inout_fd)
 		exit(EXIT_FAILURE);
 	}
 	return (0);
+}
+
+int	ft_print_err_mssg(char *cmd_name)
+{
+	pid_t	pid;
+
+	if ((pid = fork()) == -1)
+		return (-1);
+	if (pid == 0)
+	{
+		close(1);
+		dup2(2, 1);
+		printf("pipex: %s: command not found\n", cmd_name);
+	}
+	return (EXIT_ERROR);
 }
 
 int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
@@ -75,9 +90,9 @@ int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
 			if (cmds[i].id == cmds[i].ncmds)
 				dup2(inout_fd[1], 1);
 			ft_manage_pipes(pipes, cmds[i].ncmds, CLOSE);
+			ft_manage_pipes(inout_fd, 2, CLOSE);
 			if (execve(cmds[i].path, cmds[i].args, env) == -1)
-				ft_putstr_fd(">>> Command not found <<<\n", 2);
-			exit (EXIT_ERROR);
+				exit(ft_print_err_mssg(cmds[i].name));
 		}
 		cmds[i].pid = pid;
 	}

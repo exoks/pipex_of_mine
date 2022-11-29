@@ -6,31 +6,31 @@
 #    By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/23 13:03:13 by oezzaou           #+#    #+#              #
-#    Updated: 2022/11/26 21:54:38 by oezzaou          ###   ########.fr        #
+#    Updated: 2022/11/27 22:01:49 by oezzaou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 SRC = pipex.c pipex_utils.c
 CFLAGS = -Wall -Wextra -Werror
 CC = gcc
-HEADER = -I. -I libft
+HEADER = -Ipipex.h -Ift_printf/include/ -Ift_printf/libft
 NAME = pipex
 
 all: $(NAME)
 
 $(NAME): $(SRC)
-	make -C libft/
-	$(CC) $(CFLAGS) $^ libft/libft.a $(HEADER) -o $@
+	make -C ft_printf/
+	$(CC) $(CFLAGS) $^ ft_printf/libftprintf.a $(HEADER) -o $@
 
 clean: 
-	make -C libft/ clean
+	make -C ft_printf/ clean
 	rm -rf $(NAME)
 
 fclean: clean
-	make -C libft/ fclean
+	make -C ft_printf/ fclean
 
 re : fclean all
 
-#bonus: fclean all
+bonus: fclean all
 
 test:
 	./$(NAME) "file1" "ls -l" "wc" "file2" && cat file2

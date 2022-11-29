@@ -6,12 +6,12 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:09:44 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/11/26 20:08:36 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/11/27 19:10:40 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef PIPEX_H
 # define PIPEX_H
-# include "libft.h"
+# include "ft_printf.h"
 # include <fcntl.h>
 # include <stdio.h>
 # define PIPE 1
