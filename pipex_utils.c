@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/01 19:03:28 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/02 16:45:07 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -50,7 +50,7 @@ char	**ft_extract_args(char *cmd)
 //	int		i;
 
 	tmp = ft_strtrim(cmd, "./\"");
-	if (!access(tmp, F_OK) && !access(tmp, X_OK))
+	if (!access(tmp, F_OK))
 		return (ft_split(cmd, '\0'));
 	sep = (int) ft_whos_first(cmd);
 	args = ft_split(cmd, sep);

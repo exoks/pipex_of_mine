@@ -6,13 +6,14 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:09:44 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/11/27 19:10:40 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/02 16:39:50 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef PIPEX_H
 # define PIPEX_H
 # include "ft_printf.h"
 # include <fcntl.h>
+# include <errno.h>
 # include <stdio.h>
 # define PIPE 1
 # define CLOSE 0

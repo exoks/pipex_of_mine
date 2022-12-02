@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/01 20:15:42 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/02 16:50:31 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -54,10 +54,12 @@ int	get_inout_files(t_cmd *cmds, int *inout_fd)
 	return (0);
 }
 
-int	ft_print_err_mssg(char *cmd_name, t_cmd *cmds, int *inout_fd)
+int	ft_print_err_mssg(t_cmd *cmds)
 {
 	pid_t	pid;
+//	char	*tmp;
 
+//	tmp = strerror(errno);
 	if ((pid = fork()) == -1)
 		return (-1);
 	if (pid == 0)
@@ -65,9 +67,9 @@ int	ft_print_err_mssg(char *cmd_name, t_cmd *cmds, int *inout_fd)
 		close(1);
 		dup2(2, 1);
 		if (!cmds->path)
-			printf("pipex: %s: command not found\n", cmd_name);
-		if (inout_fd[0] == -1)
-			printf("Error \n");
+			printf("pipex: %s: command not found\n", cmds->name);
+		if (!access(cmds->name, F_OK))
+			printf("pipex: permission denied: %s\n", cmds->name);
 	}
 	return (EXIT_ERROR);
 }
@@ -82,7 +84,7 @@ int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
 	{
 		if ((pid = fork()) == -1)
 			perror("Error creating child process \n");
-		else if (pid == 0)
+		if (pid == 0)
 		{
 			if (cmds[i].id == 1)
 			{
@@ -100,7 +102,7 @@ int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
 			ft_manage_pipes(pipes, cmds[i].ncmds, CLOSE);
 			ft_manage_pipes(inout_fd, 2, CLOSE);
 			if (execve(cmds[i].path, cmds[i].args, env) == -1)
-				exit(ft_print_err_mssg(cmds[i].name, &cmds[i], inout_fd));
+				exit(ft_print_err_mssg(&cmds[i]));
 		}
 		cmds[i].pid = pid;
 	}
