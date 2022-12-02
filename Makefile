@@ -6,7 +6,7 @@
 #    By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/23 13:03:13 by oezzaou           #+#    #+#              #
-#    Updated: 2022/11/27 22:01:49 by oezzaou          ###   ########.fr        #
+#    Updated: 2022/12/01 12:01:19 by oezzaou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 SRC = pipex.c pipex_utils.c
@@ -33,5 +33,5 @@ re : fclean all
 bonus: fclean all
 
 test:
-	./$(NAME) "file1" "ls -l" "wc" "file2" && cat file2
+	./$(NAME) "file1" "./hello world.sh" "cat -e" "file2" && cat file2
 .PHONEY: all clean fclean re

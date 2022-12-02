@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/11/29 16:19:15 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/01 19:03:28 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -49,6 +49,9 @@ char	**ft_extract_args(char *cmd)
 	char	*tmp;
 //	int		i;
 
+	tmp = ft_strtrim(cmd, "./\"");
+	if (!access(tmp, F_OK) && !access(tmp, X_OK))
+		return (ft_split(cmd, '\0'));
 	sep = (int) ft_whos_first(cmd);
 	args = ft_split(cmd, sep);
 	tmp = args[0];
@@ -100,7 +103,7 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
 		cmds[i - 2].args = ft_extract_args(av[i]);
 		cmds[i - 2].name = (cmds[i - 2].args)[0];
 		if (!access(cmds[i - 2].name, F_OK & X_OK))
-			cmds[i - 2].path = ft_strtrim(cmds[i - 2].name, "./\"");
+			cmds[i - 2].path = ft_strdup(cmds[i - 2].name);
 		else
 			cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", cmds[i - 2].name), env);
 		cmds[i - 2].ncmds = ac - 3;
