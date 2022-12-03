@@ -6,13 +6,13 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/02 16:45:07 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/03 12:52:25 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
 
-char	*ft_get_cmd_path(char *cmd_name, char **env);
-char	**ft_get_paths(char **env);
+char	*ft_get_cmd_path(char *cmd_name, char **paths);
+char	**ft_extract_paths(char **env);
 char	**ft_mini_split(char *s);
 
 void	ft_print_cmds(t_cmd *cmds)
@@ -49,8 +49,8 @@ char	**ft_extract_args(char *cmd)
 	char	*tmp;
 //	int		i;
 
-	tmp = ft_strtrim(cmd, "./\"");
-	if (!access(tmp, F_OK))
+//	tmp = ft_strtrim(cmd, "./\"");
+	if (!access(cmd, F_OK) && *cmd == '.')
 		return (ft_split(cmd, '\0'));
 	sep = (int) ft_whos_first(cmd);
 	args = ft_split(cmd, sep);
@@ -92,20 +92,22 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
 {
 	t_cmd   *cmds;
 	int		i;
+	char	**paths;
 
+	paths = ft_extract_paths(env);
 	cmds = (t_cmd *) malloc(sizeof(t_cmd) * ac - 2);
-	if (!cmds)
+	if (!cmds || !paths)
 		return (0);
 	i = 1;
 	while (++i < ac - 1)
 	{
 		cmds[i - 2].id = i - 1;
 		cmds[i - 2].args = ft_extract_args(av[i]);
-		cmds[i - 2].name = (cmds[i - 2].args)[0];
-		if (!access(cmds[i - 2].name, F_OK & X_OK))
-			cmds[i - 2].path = ft_strdup(cmds[i - 2].name);
+		cmds[i - 2].name = ft_strtrim((cmds[i - 2].args)[0], "./");
+		if (!access((cmds[i - 2].args)[0], F_OK & X_OK) && (cmds[i - 2].args)[0][0] == '.')
+			cmds[i - 2].path = ft_strdup((cmds[i - 2].args)[0]);
 		else
-			cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", cmds[i - 2].name), env);
+			cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", cmds[i - 2].name), paths);
 		cmds[i - 2].ncmds = ac - 3;
 		cmds[i - 2].infile = av[1];
 		cmds[i - 2].outfile = av[ac - 1];
@@ -114,29 +116,24 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
 	return (cmds);
 }
 
-char	*ft_get_cmd_path(char *cmd_name, char **env)
+char	*ft_get_cmd_path(char *cmd_name, char **paths)
 {
-	int		i;
-	char	*tmp;
-	char	**paths;
 	char	*path;
 
-	path = 0;
-	paths = ft_get_paths(env);
 	if (!paths)
 		return (0);
-	i = -1;
-	while (paths[++i])
+	while (*paths)
 	{
-		tmp = ft_strjoin(paths[i], cmd_name);
-		if (!access(tmp, F_OK & X_OK))
-			path = ft_strjoin(paths[i], cmd_name);
-		free(tmp);
-		free(paths[i]);
+		path = ft_strjoin(*paths, cmd_name);
+		if (!access(path, F_OK & X_OK))
+			return (path);
+		//printf("tmp path:-=> %s\n", path);
+		free(path);
+		paths++;
 	}
 	free(cmd_name);
-	free(paths);
-	return (path);
+	//printf("final path:-==> %s\n", path);
+	return (0);
 }
 
 char	**ft_mini_split(char *s)
@@ -156,7 +153,7 @@ char	**ft_mini_split(char *s)
 	return (tab);
 }
 
-char	**ft_get_paths(char **env)
+char	**ft_extract_paths(char **env)
 {
 	char	*path;
 

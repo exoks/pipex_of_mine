@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/02 16:50:31 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/03 12:51:10 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -18,6 +18,7 @@ int	main(int ac, char **av, char **env)
 	int		status;
 	int		inout_fd[2];
 
+//	env = 0;
 	status = 0;
 	pipes = NULL;
 	if (ac <= 4)
@@ -43,14 +44,9 @@ int	main(int ac, char **av, char **env)
 int	get_inout_files(t_cmd *cmds, int *inout_fd)
 {
 	inout_fd[0] = open(cmds->infile, O_RDONLY | O_CREAT, 0644);
-	if (inout_fd[0] == -1)
-		perror("File");
 	inout_fd[1] = open(cmds->outfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (inout_fd[1] == -1)
-	{
-		perror(0);
 		exit(EXIT_FAILURE);
-	}
 	return (0);
 }
 
@@ -68,9 +64,13 @@ int	ft_print_err_mssg(t_cmd *cmds)
 		dup2(2, 1);
 		if (!cmds->path)
 			printf("pipex: %s: command not found\n", cmds->name);
-		if (!access(cmds->name, F_OK))
+		if (!access(cmds->name, F_OK) && access(cmds->name, X_OK))
 			printf("pipex: permission denied: %s\n", cmds->name);
 	}
+	if (!cmds->path)
+		exit(EXIT_ERROR);
+	if (!access(cmds->name, F_OK) && access(cmds->name, X_OK))
+		return (EXIT_ERROR - 1);
 	return (EXIT_ERROR);
 }
 
