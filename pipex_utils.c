@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/03 12:52:25 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/03 19:00:00 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -50,7 +50,7 @@ char	**ft_extract_args(char *cmd)
 //	int		i;
 
 //	tmp = ft_strtrim(cmd, "./\"");
-	if (!access(cmd, F_OK) && *cmd == '.')
+	if (!access(cmd, F_OK & X_OK))
 		return (ft_split(cmd, '\0'));
 	sep = (int) ft_whos_first(cmd);
 	args = ft_split(cmd, sep);
@@ -103,8 +103,8 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
 	{
 		cmds[i - 2].id = i - 1;
 		cmds[i - 2].args = ft_extract_args(av[i]);
-		cmds[i - 2].name = ft_strtrim((cmds[i - 2].args)[0], "./");
-		if (!access((cmds[i - 2].args)[0], F_OK & X_OK) && (cmds[i - 2].args)[0][0] == '.')
+		cmds[i - 2].name = (cmds[i - 2].args)[0];
+		if (!access((cmds[i - 2].args)[0], F_OK & X_OK) && ft_strchr((cmds[i - 2].args)[0], '/'))
 			cmds[i - 2].path = ft_strdup((cmds[i - 2].args)[0]);
 		else
 			cmds[i - 2].path = ft_get_cmd_path(ft_strjoin("/", cmds[i - 2].name), paths);
@@ -161,6 +161,6 @@ char	**ft_extract_paths(char **env)
 	while (env && *env && !ft_strnstr(*env, "PATH", 4))
 		env++;
 	if (env && *env)
-		return (ft_split(ft_strchr(*env, '/'), ':'));
+		return (ft_split(ft_strchr(*env, '=') + 1, ':'));
 	return (ft_split(path, ':'));
 }

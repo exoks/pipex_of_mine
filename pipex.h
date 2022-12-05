@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:09:44 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/02 16:39:50 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/03 19:23:46 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef PIPEX_H
@@ -18,6 +18,7 @@
 # define PIPE 1
 # define CLOSE 0
 # define EXIT_ERROR 127
+# define PERMISSION_DENIED 126
 
 typedef struct s_cmd
 {

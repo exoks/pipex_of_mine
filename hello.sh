@@ -2,3 +2,4 @@
 
 msg="hello world"
 echo ${msg}
+ls

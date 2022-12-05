@@ -6,10 +6,12 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/03 12:51:10 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/05 02:20:45 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
+
+char	**ft_here_doc(int ac, char **av);
 
 int	main(int ac, char **av, char **env)
 {
@@ -18,16 +20,18 @@ int	main(int ac, char **av, char **env)
 	int		status;
 	int		inout_fd[2];
 
-//	env = 0;
 	status = 0;
 	pipes = NULL;
 	if (ac <= 4)
 		return (EXIT_FAILURE);
+	av = ft_here_doc(ac, av);
+//	while (*av)
+//		printf("%s\n", *(av++));
 	cmds = ft_extract_cmds(ac, av, env);
 	get_inout_files(cmds, &inout_fd[0]);
 	pipes = ft_manage_pipes(pipes, cmds->ncmds, PIPE);
 	ft_exec_cmds(cmds, env, pipes, inout_fd);
-//	ft_print_cmds(cmds);
+	//ft_print_cmds(cmds);
 	ft_manage_pipes(inout_fd, 2, CLOSE);
 	ft_manage_pipes(pipes, cmds->ncmds, CLOSE);
 	int	i = -1;
@@ -39,6 +43,33 @@ int	main(int ac, char **av, char **env)
 	ft_clear_cmds(cmds);
 	free(pipes);
 	return (WEXITSTATUS(status));
+}
+
+char	**ft_here_doc(int ac, char **av)
+{
+	char	**tab;
+	int	i;
+	int	fd;
+	char	c;
+
+	tab = (char **) malloc(sizeof(char *) * (ac - 1));
+	if (!tab)
+		return (0);
+	tab[0] = av[0];
+	tab[1] = "file1";
+	i = -1;
+	while (av[++i + 3])
+		tab[i + 2] = av[i + 3];
+	tab[i + 2] = NULL;
+	fd = open(tab[1], O_CREAT | O_RDWR, 0644);
+	if (fd == -1)
+		return (0);
+	while (1)
+	{
+		while (read(1, &c, 1) > 0)
+			write(fd, &c, 1);
+	}
+	return (tab);
 }
 
 int	get_inout_files(t_cmd *cmds, int *inout_fd)
@@ -77,7 +108,7 @@ int	ft_print_err_mssg(t_cmd *cmds)
 int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
 {
 	pid_t	pid;
-	int		i;
+	int	i;
 
 	i = -1;
 	while (cmds[++i].id)
