@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:09:44 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/03 19:23:46 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/05 18:19:51 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef PIPEX_H
@@ -36,6 +36,8 @@ t_cmd	*ft_extract_cmds(int ac, char **av, char **env);
 int		*ft_manage_pipes(int *pipes, int ncmds, int flag);
 int		ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd);
 void	ft_clear_cmds(t_cmd *cmds);
-int		get_inout_files(t_cmd *cmds, int *inout_fd);
+int		get_inout_files(t_cmd *cmds, int *inout_fd, int is_here_doc);
 void	ft_print_cmds(t_cmd *cmds);
+char	**ft_here_doc(int ac, char **av);
+char	*get_next_line(int fd);
 #endif

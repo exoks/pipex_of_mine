@@ -6,14 +6,13 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/03 19:00:00 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/05 15:20:09 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
 
 char	*ft_get_cmd_path(char *cmd_name, char **paths);
 char	**ft_extract_paths(char **env);
-char	**ft_mini_split(char *s);
 
 void	ft_print_cmds(t_cmd *cmds)
 {
@@ -127,30 +126,11 @@ char	*ft_get_cmd_path(char *cmd_name, char **paths)
 		path = ft_strjoin(*paths, cmd_name);
 		if (!access(path, F_OK & X_OK))
 			return (path);
-		//printf("tmp path:-=> %s\n", path);
 		free(path);
 		paths++;
 	}
 	free(cmd_name);
-	//printf("final path:-==> %s\n", path);
 	return (0);
-}
-
-char	**ft_mini_split(char *s)
-{
-	int		i;
-	char	**tab;
-	
-	i = -1;
-	while (s[++i] && s[i] != ' ')
-		;
-	tab = (char **) malloc(sizeof(char *) * 3);
-	if (!tab)
-		return (0);
-	tab[0] = ft_substr(s, 0, i);
-	tab[1] = ft_strdup(&s[i + 1]);
-	tab[2] = 0;
-	return (tab);
 }
 
 char	**ft_extract_paths(char **env)
