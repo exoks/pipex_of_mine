@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/06 01:10:31 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/06 20:09:37 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -19,20 +19,20 @@ int	main(int ac, char **av, char **env)
 	int		inout_fd[2];
 	int		is_here_doc;
 
-	is_here_doc = 0;
-	status = 0;
-	pipes = NULL;
+	
 	if (ac <= 4)
 		return (EXIT_FAILURE);
-	if (!ft_strncmp(av[1], "here_doc", ft_strlen(av[1])) && ac > 5 && ++is_here_doc)
-		av = ft_here_doc(ac--, av);
-//	while (*av)
-//		printf(":==> %s\n", *av++);
+	status = 0;
+	pipes = NULL;
+	is_here_doc = (!ft_strncmp(av[1], "here_doc", ft_strlen(av[1])));
+//	printf("HERE_DOC|==> %s\n", (is_here_doc)? "yes": "no");
+	pipes = ft_manage_pipes(pipes, ac - 3, PIPE);
+	if (is_here_doc && ac > 5)
+		av = ft_here_doc(ac--, av, pipes);
 	cmds = ft_extract_cmds(ac, av, env);
-	get_inout_files(cmds, &inout_fd[0], is_here_doc);
-	pipes = ft_manage_pipes(pipes, cmds->ncmds, PIPE);
-	ft_exec_cmds(cmds, env, pipes, inout_fd);
 //	ft_print_cmds(cmds);
+	get_inout_files(cmds, &inout_fd[0], is_here_doc, pipes);
+	ft_exec_cmds(cmds, env, pipes, inout_fd, is_here_doc);
 	ft_manage_pipes(inout_fd, 2, CLOSE);
 	ft_manage_pipes(pipes, cmds->ncmds, CLOSE);
 	int	i = -1;
@@ -43,19 +43,18 @@ int	main(int ac, char **av, char **env)
 	}
 	ft_clear_cmds(cmds);
 	free(pipes);
-//	if (is_here_doc)
-//		unlink(av[1]);
 	return (WEXITSTATUS(status));
 }
 
-int	get_inout_files(t_cmd *cmds, int *inout_fd, int is_here_doc)
+int	get_inout_files(t_cmd *cmds, int *inout_fd, int is_here_doc, int *pipes)
 {
 	int	flag;
 
-	flag = O_TRUNC;
+	flag = O_APPEND * (is_here_doc) + O_TRUNC * (!is_here_doc);
 	if (is_here_doc)
-		flag = O_APPEND;
-	inout_fd[0] = open(cmds->infile, O_RDONLY | O_CREAT, 0644);
+		inout_fd[0] = dup(pipes[0]);
+	else
+		inout_fd[0] = open(cmds->infile, O_RDONLY | O_CREAT, 0644);
 	inout_fd[1] = open(cmds->outfile, O_CREAT | O_WRONLY | flag, 0644);
 	if (inout_fd[1] == -1)
 		exit(EXIT_FAILURE);
@@ -86,7 +85,7 @@ int	ft_print_err_mssg(t_cmd *cmds)
 	return (EXIT_ERROR);
 }
 
-int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
+int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd, int is_here_doc)
 {
 	pid_t	pid;
 	int		i;
@@ -98,20 +97,29 @@ int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
 			perror("Error creating child process \n");
 		if (pid == 0)
 		{
+			printf("in: %d\nout : %d\n", inout_fd[0], inout_fd[1]);
 			if (cmds[i].id == 1)
 			{
 				if (inout_fd[0] == -1)
 					break;
+				else if (is_here_doc)
+					dup2(pipes[0], 0);
 				else
 					dup2(inout_fd[0], 0);
 			}
 			if (cmds[i].id > 1)
-				dup2(pipes[(2 * i) - 2], 0);
+			{
+				printf("\n=========\nre: %d\n(READ)==> fd[%d]", -1, 2 * i - (2 * (!is_here_doc)));
+				/*int re = */dup2(pipes[2 * i - (2 * (!is_here_doc))], 0);
+			}
 			if (cmds[i].id < cmds[i].ncmds)
-				dup2(pipes[2 * i + 1], 1);
+			{
+				printf("\n=========\nre: %d\n(WRITE)==> fd[%d]", -1, 2 * i + 1 + (2 * is_here_doc));
+				/*int re = */dup2(pipes[2 * i + 1 + (2 * is_here_doc)], 1);
+			}
 			if (cmds[i].id == cmds[i].ncmds)
 				dup2(inout_fd[1], 1);
-			ft_manage_pipes(pipes, cmds[i].ncmds, CLOSE);
+			ft_manage_pipes(pipes, cmds[i].ncmds + is_here_doc, CLOSE);
 			ft_manage_pipes(inout_fd, 2, CLOSE);
 			if (execve(cmds[i].path, cmds[i].args, env) == -1)
 				exit(ft_print_err_mssg(&cmds[i]));
@@ -125,6 +133,8 @@ int *ft_manage_pipes(int *pipes, int ncmds, int flag)
 {
 	int	i;
 
+	if (flag == PIPE)
+		printf("|number of pipes created|=> %d\n", 2 * ncmds - 2);
 	if (flag == PIPE)
 		pipes = (int *) malloc(sizeof(int) * (2 * ncmds - 2));
 	if (!pipes)

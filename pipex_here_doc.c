@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 16:25:27 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/06 01:52:47 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/06 14:58:11 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -33,11 +33,10 @@ char	*get_next_line(fd)
 	return (buff);
 }
 
-char  **ft_here_doc(int ac, char **av)
+char  **ft_here_doc(int ac, char **av, int *pipes)
 {
      char    **tab;
      int     i;
-     int     fd;
 	 char	*s;
  
 
@@ -45,26 +44,21 @@ char  **ft_here_doc(int ac, char **av)
      if (!tab)
          return (0);
      tab[0] = av[0];
-     tab[1] = "file1";
+     tab[1] = "";
      i = -1;
 	 while (av[++i + 3])
 	 	tab[i + 2] = av[i + 3];
 	 tab[i + 2] = NULL;
-//	 i = -1;
-//	 while (tab[++i])
-//		 printf("=====> %s\n", tab[i]);
-	 fd = open(tab[1], O_CREAT | O_RDWR | O_TRUNC, 0644);
-	 if (fd == -1)
-		 return (0);
 	 s = get_next_line(0);
-//	if (ft_strlen(av[2]) < ft_strlen(s))
-//		len = ft_strlen(av[2]);
-	 // i have to work with the greater len
-	 while (ft_strncmp(s, av[2], ft_strlen(s) - 1) != 0)
+	 //printf("line :-> %s\n", s);
+	// printf("cmd :=> %d\n", ft_strncmp(s, av[2], ft_strlen(av[2])));
+	 while (ft_strncmp(s, av[2], ((ft_strlen(s) - 1) * (ft_strlen(s) - 1 >= ft_strlen(av[2])) + 
+					 (ft_strlen(av[2]) * (ft_strlen(s) - 1 < ft_strlen(av[2]))))))
 	 {
-		 write(fd, s, ft_strlen(s));
+		 write(pipes[1], s, ft_strlen(s));
+	//	 printf("line :-> %s\n", s);
+		 free(s);
 		 s = get_next_line(0);
 	 }
-	 close(fd);
 	 return (tab);
 }
