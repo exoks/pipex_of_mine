@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 16:25:27 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/05 20:07:19 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/06 01:52:47 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -57,8 +57,10 @@ char  **ft_here_doc(int ac, char **av)
 	 if (fd == -1)
 		 return (0);
 	 s = get_next_line(0);
+//	if (ft_strlen(av[2]) < ft_strlen(s))
+//		len = ft_strlen(av[2]);
 	 // i have to work with the greater len
-	 while (ft_strncmp(s, av[2], ft_strlen(av[2])) != 0)
+	 while (ft_strncmp(s, av[2], ft_strlen(s) - 1) != 0)
 	 {
 		 write(fd, s, ft_strlen(s));
 		 s = get_next_line(0);

@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/05 20:15:17 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/06 01:10:31 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -24,10 +24,12 @@ int	main(int ac, char **av, char **env)
 	pipes = NULL;
 	if (ac <= 4)
 		return (EXIT_FAILURE);
-	if (!ft_strncmp(av[1], "here_doc", ft_strlen(av[1])))
+	if (!ft_strncmp(av[1], "here_doc", ft_strlen(av[1])) && ac > 5 && ++is_here_doc)
 		av = ft_here_doc(ac--, av);
+//	while (*av)
+//		printf(":==> %s\n", *av++);
 	cmds = ft_extract_cmds(ac, av, env);
-	get_inout_files(cmds, &inout_fd[0], is_here_doc++);
+	get_inout_files(cmds, &inout_fd[0], is_here_doc);
 	pipes = ft_manage_pipes(pipes, cmds->ncmds, PIPE);
 	ft_exec_cmds(cmds, env, pipes, inout_fd);
 //	ft_print_cmds(cmds);
@@ -41,6 +43,8 @@ int	main(int ac, char **av, char **env)
 	}
 	ft_clear_cmds(cmds);
 	free(pipes);
+//	if (is_here_doc)
+//		unlink(av[1]);
 	return (WEXITSTATUS(status));
 }
 
@@ -52,7 +56,7 @@ int	get_inout_files(t_cmd *cmds, int *inout_fd, int is_here_doc)
 	if (is_here_doc)
 		flag = O_APPEND;
 	inout_fd[0] = open(cmds->infile, O_RDONLY | O_CREAT, 0644);
-	inout_fd[1] = open(cmds->outfile, O_CREAT | O_WRONLY | O_APPEND, 0644);
+	inout_fd[1] = open(cmds->outfile, O_CREAT | O_WRONLY | flag, 0644);
 	if (inout_fd[1] == -1)
 		exit(EXIT_FAILURE);
 	return (0);
