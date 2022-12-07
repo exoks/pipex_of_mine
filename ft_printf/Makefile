@@ -6,7 +6,7 @@
 #    By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/05 15:55:24 by oezzaou           #+#    #+#              #
-#    Updated: 2022/10/12 19:04:11 by oezzaou          ###   ########.fr        #
+#    Updated: 2022/12/07 19:02:24 by oezzaou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 NAME := libftprintf.a
@@ -20,7 +20,7 @@ LIBFT = libft/
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -c ft_printf.c $(INC)
-	make -C libft	
+	make -C libft/	
 	ar -rcs $@ libft/*.o *.o
 
 all: $(NAME)

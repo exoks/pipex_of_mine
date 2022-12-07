@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/06 14:29:14 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/07 18:22:31 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -69,7 +69,7 @@ char	**ft_extract_args(char *cmd)
 	return (args);
 }
 
-void	ft_clear_cmds(t_cmd *cmds)
+void	ft_clear(t_cmd *cmds, int *pipes)
 {
 	int	i;
 	int	j;
@@ -85,6 +85,7 @@ void	ft_clear_cmds(t_cmd *cmds)
 		free(cmds[i].args);
 	}
 	free(cmds);
+	free(pipes);
 }
 
 t_cmd	*ft_extract_cmds(int ac, char **av, char **env)
