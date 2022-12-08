@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 16:25:27 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/07 15:57:00 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/08 11:20:38 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -59,5 +59,6 @@ char  **ft_here_doc(int ac, char **av, int *pipes)
 		 free(s);
 		 s = get_next_line(0);
 	 }
+	 free(s);
 	 return (tab);
 }
