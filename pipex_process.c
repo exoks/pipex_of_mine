@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 17:40:18 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/08 17:56:43 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/10 22:12:14 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -15,7 +15,7 @@ int		ft_whos_first(char *s);
 char	**ft_extract_paths(char **env);
 char	*ft_get_cmd_path(char *cmd_name, char **paths);
 char	**ft_extract_args(char *cmd);
-
+/*
 void	ft_print_cmds(t_cmd *cmds)
 {
 	int	i;
@@ -32,6 +32,7 @@ void	ft_print_cmds(t_cmd *cmds)
 		printf("PATH|==> %s\n", cmds[i].path);
 	}
 }
+*/
 
 t_cmd	*ft_extract_cmds(int ac, char **av, char **env, int is_hdoc)
 {

@@ -6,7 +6,7 @@
 /*   By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 13:08:45 by oezzaou           #+#    #+#             */
-/*   Updated: 2022/12/08 18:09:10 by oezzaou          ###   ########.fr       */
+/*   Updated: 2022/12/15 18:54:53 by oezzaou          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "pipex.h"
@@ -32,7 +32,6 @@ int	main(int ac, char **av, char **env)
 	cmds->files->infile = av[1];
 	cmds->files->outfile = av[ac - 1];
 	cmds->files->ncmds = ac - 3;
-//	ft_print_cmds(cmds);
 	get_inout_files(cmds, &inout_fd[0]);
 	ft_exec_cmds(cmds, env, pipes, inout_fd);
 	ft_close_all_fd(cmds, pipes, inout_fd);
@@ -50,45 +49,46 @@ void	ft_wait_child_ps(t_cmd *cmds, int *status)
 
 int	get_inout_files(t_cmd *cmds, int *inout_fd)
 {
-	int	flag;
+	int		flag;
+	char	*tmp;
 
+	tmp = ft_strjoin("pipex: ", cmds->files->infile);
 	flag = O_APPEND * (cmds->hdoc) + O_TRUNC * (!cmds->hdoc);
 	inout_fd[1] = open(cmds->files->outfile, O_CREAT | O_WRONLY | flag, 0644);
 	if (inout_fd[1] == -1)
 		exit(EXIT_FAILURE);
+	if (access(cmds->files->infile, F_OK | R_OK) && !cmds->hdoc)
+		perror(tmp);
 	if (!cmds->hdoc)
-		inout_fd[0] = open(cmds->files->infile, O_CREAT | O_RDONLY, 0644);
+		inout_fd[0] = open(cmds->files->infile, O_RDONLY);
+	free(tmp);
 	return (0);
 }
 
 int	ft_exec_cmds(t_cmd *cmds, char **env, int *pipes, int *inout_fd)
 {
-	pid_t	pid;
-	int		i;
-
-	i = -1;
-	while (cmds[++i].id)
+	while (cmds->id)
 	{
-		pid = fork();
-		if (pid == -1)
-			perror("Error creating child process \n");
-		if (pid == 0)
+		cmds->pid = fork();
+		if (cmds->pid == -1)
+			perror(0);
+		if (cmds->pid == 0)
 		{
-			if (cmds[i].id == 1 && inout_fd[0] == -1)
-				break ;
-			if (cmds[i].id == 1 && inout_fd[0] != -1)
+			if (cmds->id == 1 && inout_fd[0] == -1)
+				return (EXIT_FAILURE);
+			if (cmds->id == 1 && inout_fd[0] != -1)
 				dup2(inout_fd[0] * !cmds->hdoc + (pipes[0] * cmds->hdoc), 0);
-			if (cmds[i].id > 1)
-				dup2(pipes[2 * i - (2 * (!cmds->hdoc))], 0);
-			if (cmds[i].id < (cmds[i].files)->ncmds)
-				dup2(pipes[2 * i + 1 + (2 * cmds->hdoc)], 1);
-			if (cmds[i].id == (cmds[i].files)->ncmds)
+			if (cmds->id > 1)
+				dup2(pipes[2 * (cmds->id - 1) - (2 * (!cmds->hdoc))], 0);
+			if (cmds->id < cmds->files->ncmds)
+				dup2(pipes[2 * (cmds->id - 1) + 1 + (2 * cmds->hdoc)], 1);
+			if (cmds->id == cmds->files->ncmds)
 				dup2(inout_fd[1], 1);
-			ft_close_all_fd(&cmds[i], pipes, inout_fd);
-			if (execve(cmds[i].path, cmds[i].args, env) == -1)
-				exit(ft_print_err_msg(&cmds[i]));
+			ft_close_all_fd(cmds, pipes, inout_fd);
+			if (execve(cmds->path, cmds->args, env) == -1)
+				exit (ft_print_err_msg(cmds));
 		}
-		cmds[i].pid = pid;
+		cmds++;
 	}
 	return (0);
 }

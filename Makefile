@@ -6,7 +6,7 @@
 #    By: oezzaou <oezzaou@student.1337.ma>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/23 13:03:13 by oezzaou           #+#    #+#              #
-#    Updated: 2022/12/08 17:04:06 by oezzaou          ###   ########.fr        #
+#    Updated: 2022/12/15 17:16:00 by oezzaou          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 SRC = pipex.c pipex_process.c pipex_clear.c pipex_here_doc.c
@@ -18,8 +18,9 @@ NAME = pipex
 all: $(NAME)
 
 $(NAME): $(SRC)
-	make -C ft_printf/
+	@make -C ft_printf/
 	$(CC) $(CFLAGS) $^ ft_printf/libftprintf.a $(HEADER) -o $@
+	@echo "PIPEX ======> CREATED"
 
 clean: 
 	make -C ft_printf/ clean
